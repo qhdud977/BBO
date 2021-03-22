@@ -152,42 +152,47 @@
       for idx, topic in enumerate(components):
           print("Topic %d:" % (idx+1), [(feature_names[i], topic[i].round(5)) for i in topic.argsort()[:-n - 1:-1]])
   get_topics(svd_model.components_,terms)
-```
   
+  ```
 
-  
-### 5. LDA (Latent Dirichlet Allocation)
-  
-- https://wikidocs.net/30708
-  
+  ### 5. LDA (Latent Dirichlet Allocation)
+
+  - https://wikidocs.net/30708
+
   - 문서 : 토픽의 혼합 / 각 토픽은 확률 분포에 기반하여 단어를 생성한다고 가정 
+
   - 문서 작성 과정 (가정)
+
     1. 문서에 사용한 단어의 개수 선정 
     2. 문서를 구성할 토픽의 혼합을 확률 분포에 기반하여 결정
     3. 문서에 사용할 단어 :
        토픽 분포에 기반하여 **토픽 선정 후** 
        해당 토픽에서 단어 출현 확률 분포에 따라 사용할 **단어 선정**
+
   - **LDA는 주어진 데이터를 가지고 위 과정(토픽 → 단어)을 역추적하는 방식(단어 → 토픽)으로 토픽을 찾아냄**  
+
   - 입력 : DTM 또는 TF-IDF 행렬 
+
   - LDA 수행 과정 
-    1. 사용자가 알고리즘에 토픽 개수 k 입력 
-    2. 모든 단어를 k개의 토픽 중 하나에 랜덤으로 할당 
-    3. 어떤 문서의 각 단어 w가 자신은 잘못된 토픽에 할당됐지만 다른 단어들은 잘 할당되어있는 걸로 안다면 두 가지 기준에 따라 토픽 재할당 받음.
-       - 문서 d의 단어들 중 토픽 t에 해당하는 단어의 비율 
-         - 같은 문서 안에서 토픽의 비율 확인 
-           (한 문서 안에서 토픽의 분포 확인)
-       - 토픽 t에서 단어 w의 분포 
-         - 전체 문서에서 해당 단어가 제일 많이 할당되어 있는 토픽 확인 
-         (전체 문서의 토픽에서 해당 단어의 분포 확인)
-  
-  ```python
+
+     1. 사용자가 알고리즘에 토픽 개수 k 입력 
+     2. 모든 단어를 k개의 토픽 중 하나에 랜덤으로 할당 
+     3. 어떤 문서의 각 단어 w가 자신은 잘못된 토픽에 할당됐지만 다른 단어들은 잘 할당되어있는 걸로 안다면 두 가지 기준에 따라 토픽 재할당 받음.
+        - p(토픽 t | 문서 d) : 문서 d의 단어들 중 토픽 t에 해당하는 단어의 비율 
+          같은 문서 안에서 토픽의 비율 확인 
+          (한 문서 안에서 토픽의 분포 확인)
+        - p(단어 w | 토픽 t) : 토픽 t에서 단어 w의 분포 
+
+          전체 문서에서 해당 단어가 제일 많이 할당되어 있는 토픽 확인 
+          (전체 문서의 토픽에서 해당 단어의 분포 확인)
+```python
   from gensim import corpora
   dictionary = corpora.Dictionary(tokenized_doc)
   # 각 단어를 (word_id, word_frequency)의 형태로 corpus에 저장 
   corpus = [dictionary.doc2bow(text) for text in tokenized_doc]
   print(corpus[1]) # 수행된 결과에서 두번째 뉴스 출력. 첫번째 문서의 인덱스는 0
 ```
-  
+
   ```python
   # LDA 모델 훈련 => model : ladmodel 
   import gensim
@@ -201,8 +206,8 @@
       
   # output : (18, '0.011*"year" + 0.009*"last" + 0.007*"first" + 0.006*"runs"')
   # (해당 토픽 번호, 해당 단어의 해당 토픽에 대한 기여도*단어)
-```
-  
+  ```
+
   ```python
   #시각화
   pip install pyLDAvis
@@ -215,9 +220,10 @@
   # output : 원이 겹친다면 유사한 토픽이라는 뜻 
 # 토픽의 번호 1부터 시작
   ```
-  
+
   ```python
-  # 각 문서의 토픽 분포는 이미 훈련된 LDA 모델인 ldamodel[]에 전체 데이터가 정수 인코딩 된 결과를 넣은 후에 확인이 가능
+  # 각 문서의 토픽 분포는 
+  # 이미 훈련된 LDA 모델인 ldamodel[]에 전체 데이터가 정수 인코딩 된 결과를 넣은 후에 확인이 가능
   for i, topic_list in enumerate(ldamodel[corpus]):
       if i==5:
           break
@@ -227,59 +233,60 @@
   
 
   ##### LSA vs. LDA (topic modeling 위한 것이긴 하지만 다른 방법임..)
-  
+
 - LSA : 차원을 축소하여 (SVD) 근접 단어들 토픽으로 묶음
   - LDA : 단어가 특정 토픽에 존재할 확률과 문서에 특정 토픽이 존재할 확률의 결합확률로 토픽 추정
 
   
 
-  ## NLP Metrics (evaluation)
+## NLP Metrics (evaluation)
 
-  다양한 task가 존재하기 때문에 각각에 맞는 metrics 필요 
+다양한 task가 존재하기 때문에 각각에 맞는 metrics 필요 
 
-  - cosine similarity : 벡터 간 코사인 각도로 벡터의 유사도 계산 
+- cosine similarity : 벡터 간 코사인 각도로 벡터의 유사도 계산 
 
-    - 가까울수록 1, 멀수록 -1, 관련 없다면 0
+  - 가까울수록 1, 멀수록 -1, 관련 없다면 0
 
-  - perplexity : 테스트 데이터에 대한 확률의 역수 
+- perplexity : 테스트 데이터에 대한 확률의 역수 
+
+  - ppl = {**P**(x1, x2, ... , xn) = **P**(x1)**P**(x2|x1)...**P**(xn|x1x2...xn-1) } ^ (-1/n)
+- 최소화 : 문장의 확률 최대화 
   
-    - ppl = {**P**(x1, x2, ... , xn) = **P**(x1)**P**(x2|x1)...**P**(xn|x1x2...xn-1) } ^ (-1/n)
-  - 최소화 : 문장의 확률 최대화 
-    - 낮을수록 좋은 모델 
-
-  - BLEU Score (Bilingual Evaluation Understudy Score) 
-
-    - https://donghwa-kim.github.io/BLEU.html
-
-    - 번역 모델에서 가장 많이 사용됨.
-
-    - 기계 번역 결과와 사람이 번역한 결과의 유사도 (**얼마나 겹치는지**)=> n-gram으로 측정
-
-      1. 단어 개수로 측정 
-
-         : count(기계 | 사람) / count (기계)
-
-      2. 중복 단어 보정 (같은 단어가 연속적으로 나올 때 과적합 보정)
-
-         : count (기계 번역 문장의 각 유니그램에 대해 min(count, 유니그램 몇번 등장)) / count (기계 유니그램 수)
-
-      3. 순서 고려한 n-gram
-
-  - ROUGE(Recall-Oriented Understudy for Gisting Evaluation) Score 
-
-    - https://huffon.github.io/2019/12/07/rouge/
-
-    - 문장 요약 모델의 Metric으로 자주 사용
-
-    - Rouge-N: n-gram으로 recall 점수를 측정 
-
-    - Precision/Recall/f—score와 같은 방식으로 계산 
-
-    - Rouge-L: 두 문장 중 겹치는 가장 긴 n-gram으로 계산 
-
-    - Rouge-S: skip-gram을 허용해서 계산 
+- 낮을수록 좋은 모델 
   
-      
+- BLEU Score (Bilingual Evaluation Understudy Score) 
+
+  - https://donghwa-kim.github.io/BLEU.html
+
+  - 번역 모델에서 가장 많이 사용됨.
+
+  - 기계 번역 결과와 사람이 번역한 결과의 유사도 (**얼마나 겹치는지**)=> n-gram으로 측정
+
+    1. 단어 개수로 측정 
+
+       : count(기계 | 사람) / count (기계)
+
+    2. 중복 단어 보정 (같은 단어가 연속적으로 나올 때 과적합 보정)
+
+       : count (기계 번역 문장의 각 유니그램에 대해 min(count, 유니그램 몇번 등장)) / count (기계 유니그램 수)
+
+    3. 순서 고려한 n-gram
+
+- ROUGE(Recall-Oriented Understudy for Gisting Evaluation) Score 
+
+  - https://huffon.github.io/2019/12/07/rouge/
+
+  - 문장 요약 모델의 Metric으로 자주 사용
+
+  - Rouge-N: n-gram으로 recall 점수를 측정 
+
+  - Precision/Recall/f—score와 같은 방식으로 계산 
+
+  - Rouge-L: 두 문장 중 겹치는 가장 긴 n-gram으로 계산 
+
+  - Rouge-S: skip-gram을 허용해서 계산 
+
+    
 
 # 실습
 
